@@ -1,3 +1,5 @@
+#!/usr/bin/env turinginterpreter-exe
+
 # Does bitwise OR on two bitstrings of same length, seperated by a
 # space, like '1010 1100'.
 
