@@ -72,7 +72,7 @@ installed. Once you have that, run `stack install` in the source
 directory, stack will compile the project and install
 it.
 
-If you want to use the tools without installing it, you can also run
+If you want to use the simulator without installing it, you can also run
 `stack build`, however you will need to prepend `stack exec` when
 following the usage examples.
 
