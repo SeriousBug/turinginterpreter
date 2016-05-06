@@ -1,0 +1,65 @@
+# Does bitwise XOR on two bitstrings of same length, seperated by a
+# space, like '1010 1100'.
+
+# Erase the first character of the left string. If the whole left
+# string is erased, move to end state.
+s1 {
+  0 -> _, L, s20
+  1 -> _, L, s21
+  _ -> _, L, s6
+}
+
+# Search for the seperator space to find the right string
+s20 {
+  1 -> 1, L, s20
+  0 -> 0, L, s20
+  _ -> _, L, s30
+}
+
+# Find the first unmarked character, and mark it based on the result
+# of XOR'ing that character and 0, writing X for 0 and Y for 1.
+s30 {
+  0 -> X, R, s4
+  1 -> Y, R, s4
+  X -> X, L, s30
+  Y -> Y, L, s30
+}
+
+s21 {
+  1 -> 1, L, s21
+  0 -> 0, L, s21
+  _ -> _, L, s31
+}
+
+s31 {
+  0 -> Y, R, s4
+  1 -> X, R, s4
+  X -> X, L, s31
+  Y -> Y, L, s31
+}
+
+# Search for the left string, seeking the space
+s4 {
+  _ -> _, R, s5
+  0 -> 0, R, s4
+  1 -> 1, R, s4
+  X -> X, R, s4
+  Y -> Y, R, s4
+}
+
+# Find the start of the left string, start over
+s5 {
+  _ -> _, L, s1
+  0 -> 0, R, s5
+  1 -> 1, R, s5
+}
+
+# Replace the marked symbols with their actual values. Halt when right
+# string is done.
+s6 {
+  X -> 0, L, s6
+  Y -> 1, L, s6
+  _ -> _, R, HALT
+}
+
+HALT {}

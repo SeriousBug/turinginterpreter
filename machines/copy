@@ -1,0 +1,32 @@
+# Reads an input of 1's, then copies them to the right, leaving one
+# space between the original and the copy.
+
+# If there is a 1 at the start, mark it, otherwise halt.
+s1 {
+  1 -> X, L, s2
+  _ -> _, L, HALT
+}
+
+# Search for the space between the original and the copy.
+s2 {
+  1 -> 1, L, s2
+  _ -> _, L, s3
+}
+
+# Search for the end of the copy, and append a 1.
+s3 {
+  1 -> 1, L, s3
+  _ -> 1, R, s4
+}
+
+# Go back to the marked 1 in the original, unmark that and start again
+# from the symbol to its right.
+s4 {
+  1 -> 1, R, s4
+  _ -> _, R, s4
+  X -> 1, L, s1
+}
+
+# A dummy state with no transitions. The machine will certainly halt
+# when it enters this state.
+HALT {}
