@@ -10,11 +10,23 @@ import System.Environment (getArgs)
 import qualified Text.Megaparsec as Mg
 
 
+printUsage :: IO ()
+printUsage =
+  do putStrLn "Usage: turinginterpreter-exe <machine-file>"
+     putStrLn "Example usage:"
+     putStrLn "    $ echo 111 | turinginterpreter-exe machines/copy"
+
+
 main :: IO ()
 main =
   do args <- getArgs
-     let tape = intercalate "_" args
-     interact (cleanTape . runMachine tape)
+     case length args of
+       1 ->
+         do input <- getLine
+            let tape = replace " " "_" input
+            machineFile <- readFile (head args)
+            (putStrLn . cleanTape) (runMachine tape machineFile)
+       _ -> printUsage
 
 
 runMachine :: String -> String -> String
