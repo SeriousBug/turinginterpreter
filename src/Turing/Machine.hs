@@ -7,9 +7,11 @@ module Turing.Machine
 where
 
 
+import Data.HashMap.Strict (HashMap)
+
+
 data Machine = Machine
   { currentState :: !State -- ^ Current state the machine is in
-  , states :: ![State] -- ^ All possible states of this machine
   , tapeLeft :: ![Symbol] -- ^ The tape towards the left of the head
   , tapeRight :: ![Symbol] -- ^ The tape towards the right of the head
   , tapeCurrent :: !Symbol -- ^ The symbol machine head is currently on
@@ -19,10 +21,11 @@ data Machine = Machine
 
 data State = State
   { name :: !String -- ^ Name of the state
-  , transitions :: ![Transition] -- ^ The transitions that could apply when in this state
+  , transitions :: HashMap Symbol Transition
+  -- ^ The transitions that could apply when in this state, mapping
+  -- the symbols that need to be read to the transitions themselves
   }
   deriving (Show)
-
 
 
 type Symbol = Char
@@ -35,10 +38,8 @@ data Direction
 
 
 data Transition = Transition
-  { readSyms :: ![Symbol] -- ^ The transition applies if these symbols are read
-  , writeSym :: !Symbol -- ^ This symbol is written when the transition applies
-  , direction :: !Direction -- ^ The tape will move in this direction when transition applies
-  , toState :: !String -- ^ The new state will be the state with this name when transition applies
+  { writeSym :: !Symbol -- ^ This symbol is written to tape when the transition applies
+  , direction :: !Direction -- ^ The tape will move in this direction when the transition applies
+  , toState :: State -- ^ The new state the machine will enter when the transition applies
   }
   deriving (Show)
-

@@ -32,10 +32,7 @@ main =
 runMachine :: String -> String -> String
 runMachine tape input =
   case Mg.runParser P.machine "" input of
-    Right parsed ->
-      case I.makeMachine tape parsed of
-        Nothing -> "Error! The machine must contain at least one state."
-        Just m -> I.stepUntilHalts m
+    Right parsed -> I.stepUntilHalts (I.makeMachine tape parsed)
     Left errs -> showParseError errs
 
 

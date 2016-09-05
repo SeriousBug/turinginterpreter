@@ -8,7 +8,7 @@ module Turing.Interpreter
 
 import qualified Turing.Machine as M
 
-import Data.List (find)
+import qualified Data.HashMap.Strict as HM
 
 
 -- | Continuously steps the machine until it halts, then returns the
@@ -27,32 +27,19 @@ step :: M.Machine -> Either [M.Symbol] M.Machine
 step machine =
   case transition of
     Nothing -> Left (extractTape machine)
-    Just t -> case applyTransition machine t of
-      Nothing -> Left (extractTape machine)
-      Just m -> Right m
-  where transition = find (transitionElem r) (M.transitions cs)
+    Just t -> Right (applyTransition machine t)
+  where transition = r `HM.lookup` (M.transitions cs) 
         r = M.tapeCurrent machine
         cs = M.currentState machine
 
 
--- | If the transition would apply when symbol is read from the tape,
--- returns True.
-transitionElem :: M.Symbol -> M.Transition -> Bool
-transitionElem symbol transition =
-  symbol `elem` M.readSyms transition
-
-
 -- | Applies the transition to the machine, writing the symbol and
 -- moving the tape.
-applyTransition :: M.Machine -> M.Transition -> Maybe M.Machine
+applyTransition :: M.Machine -> M.Transition -> M.Machine
 applyTransition machine transition =
-  let ms = find (\s -> (M.toState transition) == (M.name s)) (M.states machine)
-  in case ms of
-    Nothing -> Nothing
-    Just s ->
-      Just (move (M.direction transition)
-            (machine { M.tapeCurrent = M.writeSym transition
-                     , M.currentState = s}))
+    (move (M.direction transition)
+     (machine { M.tapeCurrent = M.writeSym transition
+              , M.currentState = M.toState transition}))
 
 -- | Move machines tape in the direction. Note that it is the tape and
 -- not the head being moved; a 'M.RightDirection' moves the tape to
@@ -79,11 +66,10 @@ moveTape back cur forw =
 
 -- | Given a tape and states, creates a machine. The first state in
 -- the state list will be used as the initial state.
-makeMachine :: [M.Symbol] -> [M.State] -> Maybe M.Machine
-makeMachine tape sts@(s:_) =
+makeMachine :: [M.Symbol] -> M.State -> M.Machine
+makeMachine tape state =
   let (t, ts) = pullTape tape
-  in Just (M.Machine s sts [] ts t)
-makeMachine _ _ = Nothing
+  in M.Machine state [] ts t
 
 
 -- | Returns the tape in the machine.
